@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Intelligent Poaching Detection and Response System</title>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#E6EADF;--panel:#F4F6EF;--ink:#19281F;--mute:#55665A;--line:#C3CCBA;--moss:#46694D;--alert:#C93C20;--ochre:#9A6F18;--land:#D5DCC8;--water:#B9CFCB;--blue:#3B6E8F;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101A15;--panel:#18241D;--ink:#E4EADF;--mute:#9AAB9E;--line:#2C3C32;--moss:#7FB088;--alert:#F0694B;--ochre:#D9A94A;--land:#1F2E25;--water:#1B3434;--blue:#7FB6D6}}
+:root[data-theme="dark"]{--bg:#101A15;--panel:#18241D;--ink:#E4EADF;--mute:#9AAB9E;--line:#2C3C32;--moss:#7FB088;--alert:#F0694B;--ochre:#D9A94A;--land:#1F2E25;--water:#1B3434;--blue:#7FB6D6}
+html{scroll-padding-top:70px;scroll-behavior:smooth}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16.5px/1.6 "IBM Plex Sans",system-ui,sans-serif}
+h1,h2,h3{font-family:"Familjen Grotesk","Helvetica Neue",Arial,sans-serif;line-height:1.1;margin:0;letter-spacing:-.02em}
+h1{font-size:clamp(2.3rem,6.5vw,4.4rem)}h2{font-size:clamp(1.6rem,4vw,2.4rem);margin-bottom:.4em}h3{font-size:1.15rem;margin-bottom:.3em}
+p{margin:0 0 1em;max-width:64ch}.mute{color:var(--mute)}
+:focus-visible{outline:3px solid var(--alert);outline-offset:2px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 18px}
+header.top{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+header.top .wrap{display:flex;align-items:center;gap:14px;height:56px}
+header b{font:700 1rem "Familjen Grotesk",sans-serif;white-space:nowrap}
+header nav{display:flex;gap:16px;overflow-x:auto;flex:1;font-size:.93rem;scrollbar-width:none}
+header nav a{color:var(--mute);text-decoration:none;white-space:nowrap}header nav a:hover{color:var(--ink)}
+button,.btn{font:700 .95rem "Familjen Grotesk",sans-serif;cursor:pointer;min-height:40px;border-radius:4px;padding:8px 14px;border:1px solid var(--ink);background:transparent;color:var(--ink);text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+button.pri,.btn.pri{background:var(--alert);border-color:var(--alert);color:#fff}
+button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+button:disabled{opacity:.5}
+section{padding:60px 0;border-top:1px solid var(--line)}
+.hero{padding:44px 0 56px;border:0}
+.lead{font-size:1.15rem;color:var(--mute);margin-top:16px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.grid{display:grid;gap:14px}.g4{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}.g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px}
+.kpi strong{display:block;font:700 2rem "Familjen Grotesk",sans-serif}.kpi span{font-size:.88rem;color:var(--mute)}
+.cc{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;margin-top:14px}
+@media(max-width:860px){.cc,.two{grid-template-columns:1fr!important}}
+.map{padding:0;overflow:hidden}.map svg{display:block;width:100%;height:auto}
+.tools{display:flex;gap:8px;flex-wrap:wrap;padding:10px;border-bottom:1px solid var(--line);align-items:center}
+select,input,textarea{font:inherit;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:9px 10px;width:100%}
+.tools select{width:auto}
+label{display:block;font-weight:500;font-size:.92rem;margin:12px 0 4px}
+#inc{list-style:none;margin:0;padding:0;max-height:430px;overflow:auto}
+#inc li{border-bottom:1px solid var(--line);padding:10px 0;display:grid;gap:6px}
+.sev{display:inline-block;font:700 .75rem "Familjen Grotesk";padding:2px 8px;border-radius:99px;color:#fff;margin-right:6px}
+.high{background:var(--alert)}.med{background:#9A6F18}.low{background:var(--moss)}
+.st{font-size:.85rem;color:var(--mute)}
+.acts{display:flex;gap:6px;flex-wrap:wrap}.acts button{min-height:34px;padding:4px 10px;font-size:.85rem}
+.bar{display:grid;grid-template-columns:110px 1fr 28px;gap:8px;align-items:center;font-size:.9rem;margin:8px 0}
+.bar i{display:block;height:12px;background:var(--moss);border-radius:2px;transition:width .4s}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.layers svg.ic{width:34px;height:34px;stroke:var(--moss);fill:none;stroke-width:1.8;margin-bottom:8px}
+.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:40px 1fr;padding:14px 0;border-bottom:1px solid var(--line)}
+.steps li::before{content:counter(s);font:700 1.4rem "Familjen Grotesk";color:var(--alert)}
+.steps p{margin:0;color:var(--mute)}
+details{border-bottom:1px solid var(--line);padding:14px 0}summary{cursor:pointer;font:700 1.05rem "Familjen Grotesk"}details p{margin:10px 0 0;color:var(--mute)}
+.err{color:var(--alert);font-size:.85rem;min-height:1em}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:4px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:50;max-width:90vw}
+#toast.on{opacity:1}
+.stack{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:0;padding:0}.stack li{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:.9rem}
+footer{padding:36px 0 56px;border-top:1px solid var(--line);color:var(--mute);font-size:.9rem}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+
+.card{border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+button,.btn{min-height:44px;padding:10px 18px;border-radius:8px}
+.acts button{min-height:40px;padding:6px 12px}
+.hero{padding:56px 0 64px}
+.hint{display:flex;gap:10px 24px;flex-wrap:wrap;align-items:center;border-left:5px solid var(--moss);font-size:.95rem}
+.hint b{font-family:"Familjen Grotesk",sans-serif}
+section{padding:72px 0}
+section>h2+p{margin-bottom:22px}
+#inc li{padding:14px 0}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap"><b>Poaching Detection &amp; Response</b>
+<nav aria-label="Main"><a href="#ops">Command center</a><a href="#analytics">Analytics</a><a href="#scorer">Threat scorer</a><a href="#tech">How it works</a><a href="#faq">FAQ</a><a href="#contact">Contact</a></nav>
+<button id="theme" aria-label="Toggle dark mode">Theme</button></div></header>
+
+<main class="wrap">
+<div class="hero">
+<h1>Detect threats early. Respond before it is too late.</h1>
+<p class="lead">An intelligent network of cameras, acoustic sensors, ground sensors and drones that finds poaching activity inside protected areas and sends the nearest ranger patrol to the exact spot.</p>
+<div class="row"><a class="btn pri" href="#ops">Try the live command center</a><a class="btn" href="#scorer">Test the threat scorer</a></div>
+</div>
+
+<section id="ops">
+<h2>Live command center</h2>
+<p class="mute">A working simulation. Events stream in, you verify them with a drone, dispatch the nearest patrol and watch it travel to the scene.</p>
+<div class="card hint"><b>How to use it</b><span>1. Wait for an alert or press Trigger incident</span><span>2. Tap Verify with drone</span><span>3. Tap Dispatch patrol and watch it arrive</span></div>
+<div class="grid g4" id="kpis" style="margin-top:14px">
+<div class="card kpi"><strong id="k1">0</strong><span>Active alerts</span></div>
+<div class="card kpi"><strong id="k2">8/8</strong><span>Sensors online</span></div>
+<div class="card kpi"><strong id="k3">3</strong><span>Patrols available</span></div>
+<div class="card kpi"><strong id="k4">--</strong><span>Avg response (sim seconds)</span></div>
+</div>
+<div class="cc">
+<div class="card map">
+<div class="tools">
+<button id="live" aria-pressed="true">Live feed: on</button>
+<button id="heat" aria-pressed="false">Risk hotspots</button>
+<button id="trig" class="pri">Trigger incident</button>
+<button id="rst">Reset</button>
+</div>
+<svg id="map" viewBox="0 0 600 380" role="img" aria-label="Reserve map with sensors and patrol units">
+<rect width="600" height="380" fill="var(--land)"/>
+<path d="M0 250 C120 210 190 300 300 262 S500 200 600 240 V380 H0Z" fill="var(--water)" opacity=".55"/>
+<path d="M360 0 C340 90 400 140 380 230 S430 330 410 380" fill="none" stroke="var(--water)" stroke-width="14"/>
+<path d="M40 40 L200 70 L330 40 L520 90 L560 210 L470 330 L200 345 L60 260Z" fill="none" stroke="var(--moss)" stroke-width="2" stroke-dasharray="7 6"/>
+<g id="heatg" style="display:none"></g><g id="sens"></g><g id="rings"></g><g id="units"></g>
+<rect x="56" y="290" width="20" height="20" fill="var(--ink)"/><text x="82" y="305" fill="var(--ink)" font-size="12">Base</text>
+</svg>
+<div style="padding:10px 14px;font-size:.88rem" class="mute" id="sinfo">Tap a sensor to see its details.</div>
+</div>
+<div class="card">
+<div class="tools" style="padding:0 0 10px"><b style="font-family:'Familjen Grotesk'">Incidents</b>
+<select id="flt" aria-label="Filter"><option value="all">All</option><option value="high">High</option><option value="med">Medium</option><option value="low">Low</option></select>
+<button id="csv">Copy log (CSV)</button></div>
+<ul id="inc" aria-live="polite"></ul>
+</div>
+</div>
+</section>
+
+<section id="analytics">
+<h2>Analytics</h2>
+<div class="two grid" style="grid-template-columns:1fr 1fr">
+<div class="card"><h3>Detections by type</h3><div id="bars"></div></div>
+<div class="card"><h3>Alert activity over time</h3><svg id="spark" viewBox="0 0 300 120" style="width:100%"></svg><p class="mute" style="margin:6px 0 0;font-size:.85rem">Each point is a 10 second window.</p></div>
+</div>
+</section>
+
+<section id="scorer">
+<h2>AI threat scorer</h2>
+<p class="mute">Combine what the sensors report and get a risk score with a recommended action.</p>
+<div class="two grid" style="grid-template-columns:1fr 1fr">
+<div class="card">
+<label for="sg">Signal detected</label><select id="sg"><option value="40">Gunshot</option><option value="25">Vehicle off-road</option><option value="22">Human voices</option><option value="18">Fence breach</option><option value="10">Footsteps</option><option value="0">Animal movement</option></select>
+<label for="tm">Time</label><select id="tm"><option value="0">Daytime</option><option value="10">Dusk or dawn</option><option value="20">Night</option></select>
+<label for="zn">Zone</label><select id="zn"><option value="5">Edge of reserve</option><option value="10">Buffer zone</option><option value="20">Core wildlife area</option></select>
+<label for="gp">Group size: <span id="gv">2</span></label><input id="gp" type="range" min="0" max="8" value="2">
+<label style="display:flex;gap:8px;align-items:center"><input id="rc" type="checkbox" style="width:auto"> Incident here in the last 24 hours</label>
+</div>
+<div class="card" style="text-align:center">
+<svg viewBox="0 0 200 120" style="width:240px;max-width:100%"><path d="M20 100 A80 80 0 0 1 180 100" fill="none" stroke="var(--line)" stroke-width="16"/><path id="arc" d="M20 100 A80 80 0 0 1 180 100" fill="none" stroke="var(--moss)" stroke-width="16" stroke-dasharray="0 252" style="transition:all .4s"/><text id="sc" x="100" y="98" text-anchor="middle" font-size="34" font-weight="700" fill="var(--ink)">0</text></svg>
+<h3 id="lvl">Low risk</h3><p id="rec" class="mute" style="margin:6px auto"></p>
+</div></div>
+</section>
+
+<section id="tech">
+<h2>How it works</h2>
+<div class="grid g3 layers">
+<div class="card"><svg class="ic" viewBox="0 0 36 36"><rect x="5" y="11" width="26" height="16" rx="3"/><circle cx="18" cy="19" r="5"/></svg><h3>Camera traps</h3><p class="mute">Vision models tell people, vehicles and animals apart, day or night.</p></div>
+<div class="card"><svg class="ic" viewBox="0 0 36 36"><path d="M6 18h4l3-8 5 16 4-12 3 4h5"/></svg><h3>Acoustic sensors</h3><p class="mute">Detect gunshots and chainsaws and estimate their direction.</p></div>
+<div class="card"><svg class="ic" viewBox="0 0 36 36"><path d="M4 26h28M8 26v-8M14 26v-12M20 26v-8M26 26v-14"/></svg><h3>Ground and fence sensors</h3><p class="mute">Seismic and perimeter sensors catch footsteps and breaches.</p></div>
+<div class="card"><svg class="ic" viewBox="0 0 36 36"><circle cx="18" cy="18" r="4"/><path d="M6 10l8 6M30 10l-8 6M6 26l8-6M30 26l-8-6"/></svg><h3>Drones</h3><p class="mute">Launch on alert to confirm threats before rangers commit.</p></div>
+</div>
+<h3 style="margin-top:36px">From alert to action</h3>
+<div class="grid g4" style="margin-top:12px">
+<div class="card"><h3>1. Sense</h3><p class="mute" style="margin:0">Sensors detect sound, movement and people on site, even offline.</p></div>
+<div class="card"><h3>2. Classify</h3><p class="mute" style="margin:0">Nearby signals are combined to cut false alarms.</p></div>
+<div class="card"><h3>3. Verify</h3><p class="mute" style="margin:0">A drone or camera confirms what is happening.</p></div>
+<div class="card"><h3>4. Dispatch</h3><p class="mute" style="margin:0">The nearest patrol gets the location and route.</p></div>
+</div>
+</section>
+
+<section id="faq">
+<h2>Questions</h2>
+<details><summary>Does it work without internet?</summary><p>Yes. Sensors process data at the edge and send short alerts over long-range radio, so detection keeps working with weak or no mobile coverage.</p></details>
+<details><summary>How are false alarms reduced?</summary><p>The system combines signals from several nearby sensors and a drone or camera check before dispatching a patrol.</p></details>
+<details><summary>Who sees the alerts?</summary><p>The control room and the nearest ranger patrol, on their phone or radio, with the location and threat type.</p></details>
+<details><summary>Can it predict where poaching will happen?</summary><p>Past incidents feed hotspot maps that show higher risk areas, so patrols can be planned ahead. Turn on Risk hotspots on the map to see an example.</p></details>
+</section>
+
+<section id="contact">
+<h2>Get in touch</h2>
+<div class="two grid" style="grid-template-columns:1fr 1fr">
+<form id="cf" class="card" novalidate>
+<label for="nm">Name</label><input id="nm" autocomplete="name"><div class="err" id="e1"></div>
+<label for="em">Email</label><input id="em" type="email" autocomplete="email"><div class="err" id="e2"></div>
+<label for="ms">Message</label><textarea id="ms" rows="4"></textarea><div class="err" id="e3"></div>
+<button type="submit" class="pri" style="margin-top:12px">Send message</button>
+</form>
+<div><p>Looking for conservation partners, reserve managers and funders to pilot the system.</p><p class="mute">The form opens your email app with the message filled in. Replace contact@example.com in the page with your own address.</p></div>
+</div>
+</section>
+</main>
+<footer><div class="wrap">Intelligent Poaching Detection and Response System &copy; 2026</div></footer>
+<div id="toast" role="status"></div>
+
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)},NS="http://www.w3.org/2000/svg";
+function toast(t){var e=$("toast");e.textContent=t;e.className="on";clearTimeout(toast.t);toast.t=setTimeout(function(){e.className=""},2400)}
+// theme
+var root=document.documentElement;try{var sv=localStorage.getItem("th");if(sv)root.setAttribute("data-theme",sv)}catch(e){}
+$("theme").onclick=function(){var d=root.getAttribute("data-theme")||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");var n=d==="dark"?"light":"dark";root.setAttribute("data-theme",n);try{localStorage.setItem("th",n)}catch(e){}};
+// data
+var S=[{n:"North ridge",t:"cam",x:130,y:110},{n:"Acacia belt",t:"ac",x:250,y:95},{n:"River bend",t:"cam",x:400,y:125},{n:"East boundary",t:"fence",x:500,y:170},{n:"Waterhole",t:"seis",x:440,y:285},{n:"South plain",t:"ac",x:300,y:300},{n:"West trail",t:"seis",x:160,y:190},{n:"Central valley",t:"cam",x:330,y:200}];
+var TN={cam:"Camera trap",ac:"Acoustic sensor",seis:"Ground sensor",fence:"Fence sensor"},COL={cam:"var(--blue)",ac:"var(--ochre)",seis:"var(--moss)",fence:"var(--alert)"};
+var EV={cam:[["Human detected","med"],["Vehicle off-road","med"],["Armed person","high"]],ac:[["Gunshot","high"],["Chainsaw","med"],["Engine noise","low"]],seis:[["Footsteps","low"],["Group moving at night","med"]],fence:[["Fence breach","high"],["Fence tampering","med"]]};
+var BASE=[66,300],inc=[],U=[{id:"Patrol A",x:66,y:300,st:"idle"},{id:"Patrol B",x:76,y:310,st:"idle"},{id:"Patrol C",x:86,y:300,st:"idle"}],cnt={},hist=[0],uid=0,resp=[],live=true,flt="all",clock=0;
+function mk(n,a){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);return e}
+function ts(){return new Date().toTimeString().slice(0,8)}
+// map
+S.forEach(function(s,i){var g=mk("g",{tabindex:0,role:"button","aria-label":s.n+", "+TN[s.t],style:"cursor:pointer"});g.appendChild(mk("circle",{cx:s.x,cy:s.y,r:7,fill:COL[s.t],stroke:"var(--panel)","stroke-width":2}));g.appendChild(mk("circle",{cx:s.x,cy:s.y,r:16,fill:"transparent"}));
+function show(){var n=inc.filter(function(a){return a.s===i}).length;$("sinfo").textContent=s.n+": "+TN[s.t]+", online. "+n+" incident(s) recorded here."}g.onclick=show;g.onkeydown=function(e){if(e.key==="Enter")show()};$("sens").appendChild(g)});
+[[130,110,50,.35],[500,170,55,.4],[440,285,48,.3],[300,300,40,.2]].forEach(function(h){$("heatg").appendChild(mk("circle",{cx:h[0],cy:h[1],r:h[2],fill:"var(--alert)",opacity:h[3]}))});
+U.forEach(function(u){u.el=mk("circle",{r:7,fill:"#fff",stroke:"var(--ink)","stroke-width":3});u.lb=mk("text",{"font-size":10,fill:"var(--ink)","font-weight":700});u.lb.textContent=u.id.slice(-1);$("units").appendChild(u.el);$("units").appendChild(u.lb)});
+function place(){U.forEach(function(u){u.el.setAttribute("cx",u.x);u.el.setAttribute("cy",u.y);u.lb.setAttribute("x",u.x+10);u.lb.setAttribute("y",u.y-8)})}
+// incidents
+function add(i){var s=S[i],e=EV[s.t],p=e[Math.floor(Math.random()*e.length)];var a={id:++uid,s:i,n:p[0],sev:p[1],st:"New",t:ts(),c:clock};inc.unshift(a);cnt[p[0]]=(cnt[p[0]]||0)+1;hist[hist.length-1]++;toast("Alert: "+p[0]+" at "+s.n);draw()}
+function nearest(a){var b=null,d=1e9,s=S[a.s];U.forEach(function(u){if(u.st==="idle"){var k=Math.hypot(u.x-s.x,u.y-s.y);if(k<d){d=k;b=u}}});return b}
+function act(a,w){if(w==="v"){a.st="Verified";toast("Drone confirmed the threat")}
+else if(w==="f"){a.st="False alarm"}
+else if(w==="d"){var u=nearest(a);if(!u){toast("No patrol available");return}u.st="enroute";u.tg=a;a.st="Dispatched: "+u.id;a.u=u}draw()}
+function draw(){var l=$("inc");l.innerHTML="";var shown=inc.filter(function(a){return flt==="all"||a.sev===flt});
+if(!shown.length){l.innerHTML='<li class="mute">No incidents yet. Wait for the live feed or press Trigger incident.</li>'}
+shown.forEach(function(a){var li=document.createElement("li"),open=!/Resolved|False/.test(a.st);
+li.innerHTML='<div><span class="sev '+a.sev+'">'+a.sev.toUpperCase()+'</span><b></b></div><div class="st"></div><div class="acts"></div>';
+li.querySelector("b").textContent=a.n+" at "+S[a.s].n;li.querySelector(".st").textContent=a.t+" · "+a.st;
+var ac=li.querySelector(".acts");if(open){if(a.st==="New")btn(ac,"Verify with drone",function(){act(a,"v")});if(a.st==="New"||a.st==="Verified")btn(ac,"Dispatch patrol",function(){act(a,"d")},1);if(a.st==="New"||a.st==="Verified")btn(ac,"False alarm",function(){act(a,"f")})}
+l.appendChild(li)});
+var act_=inc.filter(function(a){return !/Resolved|False/.test(a.st)});$("k1").textContent=act_.length;$("k3").textContent=U.filter(function(u){return u.st==="idle"}).length;
+$("k4").textContent=resp.length?Math.round(resp.reduce(function(x,y){return x+y},0)/resp.length):"--";
+$("rings").innerHTML="";act_.forEach(function(a){var s=S[a.s],c=mk("circle",{cx:s.x,cy:s.y,r:10,fill:"none",stroke:"var(--alert)","stroke-width":2});c.appendChild(mk("animate",{attributeName:"r",from:10,to:34,dur:"1.4s",repeatCount:"indefinite"}));c.appendChild(mk("animate",{attributeName:"opacity",from:1,to:0,dur:"1.4s",repeatCount:"indefinite"}));$("rings").appendChild(c)});bars()}
+function btn(p,t,f,pri){var b=document.createElement("button");b.textContent=t;if(pri)b.className="pri";b.onclick=f;p.appendChild(b)}
+function bars(){var k=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a]}),mx=Math.max.apply(null,[1].concat(k.map(function(x){return cnt[x]})));
+$("bars").innerHTML=k.length?k.map(function(x){return '<div class="bar"><span>'+x+'</span><i style="width:'+cnt[x]/mx*100+'%"></i><b>'+cnt[x]+'</b></div>'}).join(""):'<p class="mute">Waiting for detections.</p>';
+var m=Math.max.apply(null,hist.concat([1])),pts=hist.map(function(v,i){return(hist.length<2?0:i*300/(hist.length-1))+","+(110-v/m*95)}).join(" ");
+$("spark").innerHTML='<line x1="0" y1="110" x2="300" y2="110" stroke="var(--line)"/><polyline points="'+pts+'" fill="none" stroke="var(--alert)" stroke-width="2.5"/>'}
+// sim loop
+setInterval(function(){clock+=.1;U.forEach(function(u){var tx,ty;
+if(u.st==="enroute"){tx=S[u.tg.s].x;ty=S[u.tg.s].y}else if(u.st==="returning"){tx=BASE[0]+U.indexOf(u)*10;ty=BASE[1]}else return;
+var dx=tx-u.x,dy=ty-u.y,d=Math.hypot(dx,dy);
+if(d<4){if(u.st==="enroute"){u.tg.st="Resolved by "+u.id;resp.push(clock-u.tg.c);u.st="returning";toast(u.id+" reached the scene");draw()}else{u.st="idle";draw()}}
+else{u.x+=dx/d*3.2;u.y+=dy/d*3.2}});place()},100);
+setInterval(function(){if(live&&inc.filter(function(a){return !/Resolved|False/.test(a.st)}).length<5)add(Math.floor(Math.random()*S.length))},5500);
+setInterval(function(){hist.push(0);if(hist.length>24)hist.shift();bars()},10000);
+// controls
+$("live").onclick=function(){live=!live;this.setAttribute("aria-pressed",live);this.textContent="Live feed: "+(live?"on":"off")};
+$("heat").onclick=function(){var on=this.getAttribute("aria-pressed")!=="true";this.setAttribute("aria-pressed",on);$("heatg").style.display=on?"block":"none"};
+$("trig").onclick=function(){add(Math.floor(Math.random()*S.length))};
+$("rst").onclick=function(){inc=[];cnt={};hist=[0];resp=[];U.forEach(function(u,i){u.x=BASE[0]+i*10;u.y=BASE[1];u.st="idle"});place();draw();toast("Simulation reset")};
+$("flt").onchange=function(){flt=this.value;draw()};
+$("csv").onclick=function(){var t="id,time,type,location,severity,status\n"+inc.map(function(a){return[a.id,a.t,a.n,S[a.s].n,a.sev,a.st].join(",")}).join("\n");
+function fb(){var x=document.createElement("textarea");x.value=t;document.body.appendChild(x);x.select();try{document.execCommand("copy");toast("Log copied")}catch(e){toast("Copy not available")}x.remove()}
+if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(function(){toast("Log copied")},fb);else fb()};
+// scorer
+function score(){var v=+$("sg").value+ +$("tm").value+ +$("zn").value+$("gp").value*4+($("rc").checked?10:0);v=Math.min(100,v);
+$("gv").textContent=$("gp").value;$("sc").textContent=v;var lv=v>=70?["Critical risk","var(--alert)","Dispatch the nearest patrol now and launch a drone for confirmation."]:v>=45?["High risk","var(--ochre)","Verify with a drone, then put the nearest patrol on standby."]:v>=25?["Moderate risk","var(--blue)","Keep monitoring and check the next sensor readings."]:["Low risk","var(--moss)","Log the event. No action needed."];
+$("arc").setAttribute("stroke-dasharray",v*2.51+" 252");$("arc").setAttribute("stroke",lv[1]);$("lvl").textContent=lv[0];$("rec").textContent=lv[2]}
+["sg","tm","zn","gp","rc"].forEach(function(i){$(i).oninput=score;$(i).onchange=score});score();
+// form
+$("cf").onsubmit=function(e){e.preventDefault();var n=$("nm").value.trim(),m=$("em").value.trim(),g=$("ms").value.trim(),ok=true;
+$("e1").textContent=n?"":(ok=false,"Enter your name.");$("e2").textContent=/^\S+@\S+\.\S+$/.test(m)?"":(ok=false,"Enter a valid email address.");$("e3").textContent=g.length>=10?"":(ok=false,"Write at least 10 characters.");
+if(!ok)return;location.href="mailto:contact@example.com?subject="+encodeURIComponent("Project enquiry from "+n)+"&body="+encodeURIComponent(g+"\n\n"+n+" ("+m+")");toast("Opening your email app")};
+place();draw();setTimeout(function(){add(Math.floor(Math.random()*S.length))},1500);
+})();
+</script>
+</body>
+</html>
